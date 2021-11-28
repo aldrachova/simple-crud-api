@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Implementation of simple CRUD API using in-memory database",
   "scripts": {
-    "start:prod": "webpack",
+    "start:prod": "webpack && node ./dist/bundle.js ",
     "start:dev": "nodemon ./src/simple-crud-api.js"
   },
   "author": "Alena Drachova <al.drachova@gmail.com>",
