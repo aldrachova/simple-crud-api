@@ -23,7 +23,7 @@ const getPersonById = async (request, response, id) => {
     if (!isValidId(id)) {
       response.statusCode = 400;
       response.setHeader('Content-Type', 'application/json');
-      response.end(JSON.stringify({ message: `Id = ${id} is not valid`}))
+      response.end(JSON.stringify({ message: `Id = ${id} is not valid (not uuid)`}))
     } else {
       const person = await Person.getById(id);
       // server returns status code 404 and message if person is not found
@@ -40,7 +40,6 @@ const getPersonById = async (request, response, id) => {
     } 
   } catch (error) {
     // if error server return status code 500 and message
-    console.log(error)
     response.statusCode = 500;
     response.setHeader('Content-Type', 'application/json');
     response.end(JSON.stringify({ message: 'Unexpected server error has occurred'}));
@@ -81,8 +80,48 @@ const createPerson = async (request, response) => {
   }
 }
 
+// PUT /person/{personId}
+const updatePerson = async (request, response, id) => {
+  try {
+    // server returns status code 400 and message if personId is not valid
+    if (!isValidId(id)) {
+      response.statusCode = 400;
+      response.setHeader('Content-Type', 'application/json');
+      response.end(JSON.stringify({ message: `Id = ${id} is not valid (not uuid)`}));
+    } else {
+      const person = await Person.getById(id);
+      // server returns status code 404 and message if person is not found
+      if (!person) {
+        response.statusCode = 404;
+        response.setHeader('Content-Type', 'application/json');
+        response.end(JSON.stringify({ message: `Person with id = ${id} is not found`}));
+      } else {
+        // server returns status code 200 and updated person
+        const bodyData = await getBodyData(request);
+        const { name, age, hobbies } = JSON.parse(bodyData);
+        const personData = {
+          name: name || person.name,
+          age: age || person.age,
+          hobbies: hobbies || person.hobbies
+        };
+        const updatedPerson = await Person.update(id, personData);
+        response.statusCode = 200;
+        response.setHeader('Content-Type', 'application/json');
+        response.end(JSON.stringify(updatedPerson));
+      }
+    }
+  } catch(error) {
+    // if error server return status code 500 and message
+    response.statusCode = 500;
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify({ message: 'Unexpected server error has occurred'}));
+  }
+}
+
+
 module.exports = {
   getPersons,
   getPersonById,
-  createPerson
+  createPerson,
+  updatePerson
 }
