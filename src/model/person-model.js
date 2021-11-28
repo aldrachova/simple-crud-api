@@ -1,4 +1,7 @@
 const persons = require('../data/persons');
+const { v4: uuid4 } = require('uuid');
+const { writeDataToJSON } = require('../utils/utils');
+const path = require('path');
 
 const getAll = () => {
   return new Promise((resolve, reject) => {
@@ -13,7 +16,17 @@ const getById = (id) => {
   });
 }
 
+const create = (person) => {
+  return new Promise((resolve, reject) => {
+    const newPerson = {id: uuid4(), ...person};
+    persons.push(newPerson);
+    writeDataToJSON(path.join(__dirname, '../data/persons.json'), persons);
+    resolve(newPerson);
+  });
+}
+
 module.exports = {
   getAll,
-  getById
+  getById,
+  create
 }
