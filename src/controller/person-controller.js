@@ -118,10 +118,42 @@ const updatePerson = async (request, response, id) => {
   }
 }
 
+// DELETE /person/${personId}
+const deletePerson = async (request, response, id) => {
+  try {
+    // server returns status code 400 and message if personId is not valid
+    if (!isValidId(id)) {
+      response.statusCode = 400;
+      response.setHeader('Content-Type', 'application/json');
+      response.end(JSON.stringify({ message: `Id = ${id} is not valid (not uuid)`}));
+    } else {
+      const person = await Person.getById(id);
+      // server returns status code 404 and message if person is not found
+      if (!person) {
+        response.statusCode = 404;
+        response.setHeader('Content-Type', 'application/json');
+        response.end(JSON.stringify({ message: `Person with id = ${id} is not found`}));
+      } else {
+        // server returns status code 204
+        await Person.deleteById(id);
+        response.statusCode = 204;
+        response.setHeader('Content-Type', 'application/json');
+        response.end();
+      }
+    }
+  } catch (error) {
+    console.log(error)
+    // if error server return status code 500 and message
+    response.statusCode = 500;
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify({ message: 'Unexpected server error has occurred'}));
+  }
+}
 
 module.exports = {
   getPersons,
   getPersonById,
   createPerson,
-  updatePerson
+  updatePerson,
+  deletePerson
 }

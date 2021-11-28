@@ -1,4 +1,4 @@
-const persons = require('../data/persons');
+let persons = require('../data/persons');
 const { v4: uuid4 } = require('uuid');
 const { writeDataToJSON } = require('../utils/utils');
 const path = require('path');
@@ -28,16 +28,24 @@ const create = (person) => {
 const update = (id, person) => {
   return new Promise((resolve, reject) => {
     const index = persons.findIndex((person) => person.id === id);
-    let updatedPerson = persons[index];
-    updatedPerson = {id, ...person};
+    persons[index] = {id, ...person};
     writeDataToJSON(path.join(__dirname, '../data/persons.json'), persons);
-    resolve(updatedPerson);
+    resolve(persons[index]);
   });
+}
+
+const deleteById = (id) => {
+  return new Promise ((resolve, reject) => {
+    persons = persons.filter((person) => person.id !== id);
+    writeDataToJSON(path.join(__dirname, '../data/persons.json'), persons);
+    resolve();
+  })
 }
 
 module.exports = {
   getAll,
   getById,
   create,
-  update
+  update,
+  deleteById
 }
